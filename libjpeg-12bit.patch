@@ -1,0 +1,379 @@
+--- jpeg-8d.orig/jcparam.c	2008-12-30 12:38:14.000000000 +0100
++++ jpeg-8d/jcparam.c	2012-01-30 18:37:08.314031841 +0100
+@@ -195,6 +195,7 @@
+ }
+ 
+ 
++#if BITS_IN_JSAMPLE == 8
+ LOCAL(void)
+ std_huff_tables (j_compress_ptr cinfo)
+ /* Set up the standard Huffman tables (cf. JPEG standard section K.3) */
+@@ -269,6 +270,83 @@
+   add_huff_table(cinfo, &cinfo->ac_huff_tbl_ptrs[1],
+ 		 bits_ac_chrominance, val_ac_chrominance);
+ }
++#endif /* BITS_IN_JSAMPLE == 8 */
++
++#if BITS_IN_JSAMPLE == 12
++LOCAL(void)
++std_huff_tables (j_compress_ptr cinfo)
++/* 
++ * Note: these are not really "standard" since the specification includes
++ * no 12bit tables.  But they should work with any image, and at least
++ * moderately adequate as default tables.  
++ * https://sourceforge.net/tracker/?func=detail&aid=2809979&group_id=159521&atid=812162
++ */
++{
++  static const UINT8 bits_dc_luminance[17] =
++      { 0, 0, 2, 3, 1, 0, 3, 1, 0, 3, 1, 1, 1, 0, 0, 0 };
++  static const UINT8 val_dc_luminance[] =
++       { 11, 12, 9, 10, 13, 8, 6, 7, 14, 5, 0, 3, 4, 1, 15, 2 };
++
++  static const UINT8 bits_dc_chrominance[17] =
++      { 0, 0, 2, 2, 2, 3, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0 };
++  static const UINT8 val_dc_chrominance[] =
++      { 9, 10, 8, 11, 7, 12, 5, 6, 13, 14, 4, 3, 2, 1, 0, 15 };
++
++  static const UINT8 bits_ac_luminance[17] =
++      { 0, 0, 1, 4, 2, 2, 2, 1, 4, 1, 2, 0, 1, 0, 1, 0, 235 };
++
++  static const UINT8 val_ac_luminance[] =
++  {
++0x02,0x01,0x03,0x04,0x05,0x06,0x07,0x08,0x12,0x09,0x11,0x13,0x00,0x14,0x21,0x22
++,0x15,0x0a,0x23,0x31,0x16,0x32,0x17,0x24,0x33,0x41,0x18,0x25,0x42,0x51,0x0b,0x26
++,0x19,0x43,0x52,0x61,0x35,0x62,0x71,0x0c,0x0d,0x0e,0x0f,0x10,0x1a,0x1b,0x1c,0x1d
++,0x1e,0x1f,0x20,0x27,0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f,0x30,0x34,0x36,0x37
++,0x38,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,0x40,0x44,0x45,0x46,0x47,0x48,0x49,0x4a
++,0x4b,0x4c,0x4d,0x4e,0x4f,0x50,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5a,0x5b,0x5c
++,0x5d,0x5e,0x5f,0x60,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e
++,0x6f,0x70,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x7a,0x7b,0x7c,0x7d,0x7e,0x7f
++,0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f
++,0x90,0x91,0x92,0x93,0x94,0x95,0x96,0x97,0x98,0x99,0x9a,0x9b,0x9c,0x9d,0x9e,0x9f
++,0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf
++,0xb0,0xb1,0xb2,0xb3,0xb4,0xb5,0xb6,0xb7,0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0xbf
++,0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf
++,0xd0,0xd1,0xd2,0xd3,0xd4,0xd5,0xd6,0xd7,0xd8,0xd9,0xda,0xdb,0xdc,0xdd,0xde,0xdf
++,0xe0,0xe1,0xe2,0xe3,0xe4,0xe5,0xe6,0xe7,0xe8,0xe9,0xea,0xeb,0xec,0xed,0xee,0xef
++,0xf0,0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7,0xf8,0xf9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff
++  };
++
++  static const UINT8 bits_ac_chrominance[17] =
++      { 0, 0, 1, 3, 2, 5, 1, 5, 5, 3, 7, 4, 4, 3, 4, 6, 203 };
++  static const UINT8 val_ac_chrominance[] = 
++      {
++0x01,0x02,0x03,0x11,0x04,0x21,0x00,0x05,0x06,0x12,0x31,0x41,0x07,0x13,0x22,0x51
++,0x61,0x08,0x14,0x32,0x71,0x81,0x42,0x91,0xa1,0x09,0x15,0x23,0x52,0xb1,0xc1,0xf0
++,0x16,0x62,0xd1,0xe1,0x0a,0x24,0x72,0xf1,0x17,0x82,0x92,0x33,0x43,0x53,0xb2,0x0b
++,0x0c,0x18,0x35,0xa2,0xc2,0x0d,0x0e,0x0f,0x10,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f
++,0x20,0x25,0x26,0x27,0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f,0x30,0x34,0x36,0x37
++,0x38,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,0x40,0x44,0x45,0x46,0x47,0x48,0x49,0x4a
++,0x4b,0x4c,0x4d,0x4e,0x4f,0x50,0x54,0x55,0x56,0x57,0x58,0x59,0x5a,0x5b,0x5c,0x5d
++,0x5e,0x5f,0x60,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e,0x6f
++,0x70,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x7a,0x7b,0x7c,0x7d,0x7e,0x7f,0x80,0x83
++,0x84,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,0x90,0x93,0x94,0x95
++,0x96,0x97,0x98,0x99,0x9a,0x9b,0x9c,0x9d,0x9e,0x9f,0xa0,0xa3,0xa4,0xa5,0xa6,0xa7
++,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,0xb0,0xb3,0xb4,0xb5,0xb6,0xb7,0xb8,0xb9
++,0xba,0xbb,0xbc,0xbd,0xbe,0xbf,0xc0,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb
++,0xcc,0xcd,0xce,0xcf,0xd0,0xd2,0xd3,0xd4,0xd5,0xd6,0xd7,0xd8,0xd9,0xda,0xdb,0xdc
++,0xdd,0xde,0xdf,0xe0,0xe2,0xe3,0xe4,0xe5,0xe6,0xe7,0xe8,0xe9,0xea,0xeb,0xec,0xed
++,0xee,0xef,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7,0xf8,0xf9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff
++      };
++
++  add_huff_table(cinfo, &cinfo->dc_huff_tbl_ptrs[0],
++		 bits_dc_luminance, val_dc_luminance);
++  add_huff_table(cinfo, &cinfo->ac_huff_tbl_ptrs[0],
++		 bits_ac_luminance, val_ac_luminance);
++  add_huff_table(cinfo, &cinfo->dc_huff_tbl_ptrs[1],
++		 bits_dc_chrominance, val_dc_chrominance);
++  add_huff_table(cinfo, &cinfo->ac_huff_tbl_ptrs[1],
++		 bits_ac_chrominance, val_ac_chrominance);
++}
++#endif /* BITS_IN_JSAMPLE == 12 */
+ 
+ 
+ /*
+--- jpeg-8d.orig/jdct.h	2004-03-06 20:18:30.000000000 +0100
++++ jpeg-8d/jdct.h	2012-01-30 18:50:43.737392477 +0100
+@@ -160,6 +160,77 @@
+ #define jpeg_idct_1x2		jRD1x2
+ #endif /* NEED_SHORT_EXTERNAL_NAMES */
+ 
++#ifdef NEED_12_BIT_NAMES
++#define	jpeg_fdct_islow		jpeg_fdct_islow_12
++#define	jpeg_fdct_ifast		jpeg_fdct_ifast_12
++#define	jpeg_fdct_float		jpeg_fdct_float_12
++#define	jpeg_fdct_7x7		jpeg_fdct_7x7_12
++#define	jpeg_fdct_6x6		jpeg_fdct_6x6_12
++#define	jpeg_fdct_5x5		jpeg_fdct_5x5_12
++#define	jpeg_fdct_4x4		jpeg_fdct_4x4_12
++#define	jpeg_fdct_3x3		jpeg_fdct_3x3_12
++#define	jpeg_fdct_2x2		jpeg_fdct_2x2_12
++#define	jpeg_fdct_1x1		jpeg_fdct_1x1_12
++#define	jpeg_fdct_9x9		jpeg_fdct_9x9_12
++#define	jpeg_fdct_10x10		jpeg_fdct_10x10_12
++#define	jpeg_fdct_11x11		jpeg_fdct_11x11_12
++#define	jpeg_fdct_12x12		jpeg_fdct_12x12_12
++#define	jpeg_fdct_13x13		jpeg_fdct_13x13_12
++#define	jpeg_fdct_14x14		jpeg_fdct_14x14_12
++#define	jpeg_fdct_15x15		jpeg_fdct_15x15_12
++#define	jpeg_fdct_16x16		jpeg_fdct_16x16_12
++#define	jpeg_fdct_16x8		jpeg_fdct_16x8_12
++#define	jpeg_fdct_14x7		jpeg_fdct_14x7_12
++#define	jpeg_fdct_12x6		jpeg_fdct_12x6_12
++#define	jpeg_fdct_10x5		jpeg_fdct_10x5_12
++#define	jpeg_fdct_8x4		jpeg_fdct_8x4_12
++#define	jpeg_fdct_6x3		jpeg_fdct_6x3_12
++#define	jpeg_fdct_4x2		jpeg_fdct_4x2_12
++#define	jpeg_fdct_2x1		jpeg_fdct_2x1_12
++#define	jpeg_fdct_8x16		jpeg_fdct_8x16_12
++#define	jpeg_fdct_7x14		jpeg_fdct_7x14_12
++#define	jpeg_fdct_6x12		jpeg_fdct_6x12_12
++#define	jpeg_fdct_5x10		jpeg_fdct_5x10_12
++#define	jpeg_fdct_4x8		jpeg_fdct_4x8_12
++#define	jpeg_fdct_3x6		jpeg_fdct_3x6_12
++#define	jpeg_fdct_2x4		jpeg_fdct_2x4_12
++#define	jpeg_fdct_1x2		jpeg_fdct_1x2_12
++#define	jpeg_idct_islow		jpeg_idct_islow_12
++#define	jpeg_idct_ifast		jpeg_idct_ifast_12
++#define	jpeg_idct_float		jpeg_idct_float_12
++#define	jpeg_idct_7x7		jpeg_idct_7x7_12
++#define	jpeg_idct_6x6		jpeg_idct_6x6_12
++#define	jpeg_idct_5x5		jpeg_idct_5x5_12
++#define	jpeg_idct_4x4		jpeg_idct_4x4_12
++#define	jpeg_idct_3x3		jpeg_idct_3x3_12
++#define	jpeg_idct_2x2		jpeg_idct_2x2_12
++#define	jpeg_idct_1x1		jpeg_idct_1x1_12
++#define	jpeg_idct_9x9		jpeg_idct_9x9_12
++#define	jpeg_idct_10x10		jpeg_idct_10x10_12
++#define	jpeg_idct_11x11		jpeg_idct_11x11_12
++#define	jpeg_idct_12x12		jpeg_idct_12x12_12
++#define	jpeg_idct_13x13		jpeg_idct_13x13_12
++#define	jpeg_idct_14x14		jpeg_idct_14x14_12
++#define	jpeg_idct_15x15		jpeg_idct_15x15_12
++#define	jpeg_idct_16x16		jpeg_idct_16x16_12
++#define	jpeg_idct_16x8		jpeg_idct_16x8_12
++#define	jpeg_idct_14x7		jpeg_idct_14x7_12
++#define	jpeg_idct_12x6		jpeg_idct_12x6_12
++#define	jpeg_idct_10x5		jpeg_idct_10x5_12
++#define	jpeg_idct_8x4		jpeg_idct_8x4_12
++#define	jpeg_idct_6x3		jpeg_idct_6x3_12
++#define	jpeg_idct_4x2		jpeg_idct_4x2_12
++#define	jpeg_idct_2x1		jpeg_idct_2x1_12
++#define	jpeg_idct_8x16		jpeg_idct_8x16_12
++#define	jpeg_idct_7x14		jpeg_idct_7x14_12
++#define	jpeg_idct_6x12		jpeg_idct_6x12_12
++#define	jpeg_idct_5x10		jpeg_idct_5x10_12
++#define	jpeg_idct_4x8		jpeg_idct_4x8_12
++#define	jpeg_idct_3x6		jpeg_idct_3x6_12
++#define	jpeg_idct_2x4		jpeg_idct_2x4_12
++#define	jpeg_idct_1x2		jpeg_idct_1x2_12
++#endif /* NEED_12_BIT_NAMES */
++
+ /* Extern declarations for the forward and inverse DCT routines. */
+ 
+ EXTERN(void) jpeg_fdct_islow
+--- jpeg-8d.orig/jerror.c	1998-02-21 20:03:16.000000000 +0100
++++ jpeg-8d/jerror.c	2012-01-30 19:01:55.664081643 +0100
+@@ -45,6 +45,10 @@
+ #define jpeg_std_message_table	jMsgTable
+ #endif
+ 
++#ifdef NEED_12_BIT_NAMES
++#define	jpeg_std_message_table		jpeg_std_message_table_12
++#endif
++
+ #define JMESSAGE(code,string)	string ,
+ 
+ const char * const jpeg_std_message_table[] = {
+--- jpeg-8d.orig/jmemsys.h	1997-08-03 20:58:36.000000000 +0200
++++ jpeg-8d/jmemsys.h	2012-01-30 19:16:32.444111001 +0100
+@@ -32,6 +32,17 @@
+ #define jpeg_mem_term		jMemTerm
+ #endif /* NEED_SHORT_EXTERNAL_NAMES */
+ 
++#ifdef NEED_12_BIT_NAMES
++#define	jpeg_get_small		jpeg_get_small_12
++#define	jpeg_free_small		jpeg_free_small_12
++#define	jpeg_get_large		jpeg_get_large_12
++#define	jpeg_free_large		jpeg_free_large_12
++#define	jpeg_mem_available		jpeg_mem_available_12
++#define	jpeg_open_backing_store		jpeg_open_backing_store_12
++#define	jpeg_mem_init		jpeg_mem_init_12
++#define	jpeg_mem_term		jpeg_mem_term_12
++#endif /* NEED_12_BIT_NAMES */
++
+ 
+ /*
+  * These two functions are used to allocate and release small chunks of
+--- jpeg-8d.orig/jmorecfg.h	2011-08-31 13:35:12.000000000 +0200
++++ jpeg-8d/jmorecfg.h	2012-01-26 17:14:43.088960964 +0100
+@@ -21,7 +21,8 @@
+  * We do not support run-time selection of data precision, sorry.
+  */
+ 
+-#define BITS_IN_JSAMPLE  8	/* use 8 or 12 */
++#define BITS_IN_JSAMPLE  12	/* use 8 or 12 */
++#define NEED_12_BIT_NAMES
+ 
+ 
+ /*
+--- jpeg-8d.orig/jpegint.h	2011-10-13 10:53:56.000000000 +0200
++++ jpeg-8d/jpegint.h	2012-01-30 19:17:54.740780423 +0100
+@@ -335,6 +335,49 @@
+ #define jpeg_aritab		jAriTab
+ #endif /* NEED_SHORT_EXTERNAL_NAMES */
+ 
++#ifdef NEED_12_BIT_NAMES
++#define	jinit_compress_master		jinit_compress_master_12
++#define	jinit_c_master_control		jinit_c_master_control_12
++#define	jinit_c_main_controller		jinit_c_main_controller_12
++#define	jinit_c_prep_controller		jinit_c_prep_controller_12
++#define	jinit_c_coef_controller		jinit_c_coef_controller_12
++#define	jinit_color_converter		jinit_color_converter_12
++#define	jinit_downsampler		jinit_downsampler_12
++#define	jinit_forward_dct		jinit_forward_dct_12
++#define	jinit_huff_encoder		jinit_huff_encoder_12
++#define	jinit_arith_encoder		jinit_arith_encoder_12
++#define	jinit_marker_writer		jinit_marker_writer_12
++#define	jinit_master_decompress		jinit_master_decompress_12
++#define	jinit_d_main_controller		jinit_d_main_controller_12
++#define	jinit_d_coef_controller		jinit_d_coef_controller_12
++#define	jinit_d_post_controller		jinit_d_post_controller_12
++#define	jinit_input_controller		jinit_input_controller_12
++#define	jinit_marker_reader		jinit_marker_reader_12
++#define	jinit_huff_decoder		jinit_huff_decoder_12
++#define	jinit_arith_decoder		jinit_arith_decoder_12
++#define	jinit_inverse_dct		jinit_inverse_dct_12
++#define	jinit_upsampler		jinit_upsampler_12
++#define	jinit_color_deconverter		jinit_color_deconverter_12
++#define	jinit_1pass_quantizer		jinit_1pass_quantizer_12
++#define	jinit_2pass_quantizer		jinit_2pass_quantizer_12
++#define	jinit_merged_upsampler		jinit_merged_upsampler_12
++#define	jinit_memory_mgr		jinit_memory_mgr_12
++#define	jdiv_round_up		jdiv_round_up_12
++#define	jround_up		jround_up_12
++#define	jzero_far		jzero_far_12
++#define	jcopy_sample_rows		jcopy_sample_rows_12
++#define	jcopy_block_row		jcopy_block_row_12
++#define	jpeg_zigzag_order		jpeg_zigzag_order_12
++#define	jpeg_natural_order		jpeg_natural_order_12
++#define	jpeg_natural_order7		jpeg_natural_order7_12
++#define	jpeg_natural_order6		jpeg_natural_order6_12
++#define	jpeg_natural_order5		jpeg_natural_order5_12
++#define	jpeg_natural_order4		jpeg_natural_order4_12
++#define	jpeg_natural_order3		jpeg_natural_order3_12
++#define	jpeg_natural_order2		jpeg_natural_order2_12
++#define	jpeg_aritab		jpeg_aritab_12
++#endif /* NEED_12_BIT_NAMES */
++
+ 
+ /* On normal machines we can apply MEMCOPY() and MEMZERO() to sample arrays
+  * and coefficient-block arrays.  This won't work on 80x86 because the arrays
+--- jpeg-8d.orig/jpeglib.h	2011-08-27 18:15:42.000000000 +0200
++++ jpeg-8d/jpeglib.h	2012-01-30 19:19:05.244116117 +0100
+@@ -923,6 +923,65 @@
+ #define jpeg_resync_to_restart	jResyncRestart
+ #endif /* NEED_SHORT_EXTERNAL_NAMES */
+ 
++/* Sometimes it is desirable to build with special external names for 12bit, so that 8bit and 12bit
++   jpeg DLLs can be used in the same applications. */
++
++#ifdef NEED_12_BIT_NAMES
++#define	jpeg_std_error		jpeg_std_error_12
++#define	jpeg_CreateCompress		jpeg_CreateCompress_12
++#define	jpeg_CreateDecompress		jpeg_CreateDecompress_12
++#define	jpeg_destroy_compress		jpeg_destroy_compress_12
++#define	jpeg_destroy_decompress		jpeg_destroy_decompress_12
++#define	jpeg_stdio_dest		jpeg_stdio_dest_12
++#define	jpeg_stdio_src		jpeg_stdio_src_12
++#define	jpeg_mem_dest		jpeg_mem_dest_12
++#define	jpeg_mem_src		jpeg_mem_src_12
++#define	jpeg_set_defaults		jpeg_set_defaults_12
++#define	jpeg_set_colorspace		jpeg_set_colorspace_12
++#define	jpeg_default_colorspace		jpeg_default_colorspace_12
++#define	jpeg_set_quality		jpeg_set_quality_12
++#define	jpeg_set_linear_quality		jpeg_set_linear_quality_12
++#define	jpeg_default_qtables		jpeg_default_qtables_12
++#define	jpeg_add_quant_table		jpeg_add_quant_table_12
++#define	jpeg_quality_scaling		jpeg_quality_scaling_12
++#define	jpeg_simple_progression		jpeg_simple_progression_12
++#define	jpeg_suppress_tables		jpeg_suppress_tables_12
++#define	jpeg_alloc_quant_table		jpeg_alloc_quant_table_12
++#define	jpeg_alloc_huff_table		jpeg_alloc_huff_table_12
++#define	jpeg_start_compress		jpeg_start_compress_12
++#define	jpeg_write_scanlines		jpeg_write_scanlines_12
++#define	jpeg_finish_compress		jpeg_finish_compress_12
++#define	jpeg_calc_jpeg_dimensions		jpeg_calc_jpeg_dimensions_12
++#define	jpeg_write_raw_data		jpeg_write_raw_data_12
++#define	jpeg_write_marker		jpeg_write_marker_12
++#define	jpeg_write_m_header		jpeg_write_m_header_12
++#define	jpeg_write_m_byte		jpeg_write_m_byte_12
++#define	jpeg_write_tables		jpeg_write_tables_12
++#define	jpeg_read_header		jpeg_read_header_12
++#define	jpeg_start_decompress		jpeg_start_decompress_12
++#define	jpeg_read_scanlines		jpeg_read_scanlines_12
++#define	jpeg_finish_decompress		jpeg_finish_decompress_12
++#define	jpeg_read_raw_data		jpeg_read_raw_data_12
++#define	jpeg_has_multiple_scans		jpeg_has_multiple_scans_12
++#define	jpeg_start_output		jpeg_start_output_12
++#define	jpeg_finish_output		jpeg_finish_output_12
++#define	jpeg_input_complete		jpeg_input_complete_12
++#define	jpeg_new_colormap		jpeg_new_colormap_12
++#define	jpeg_consume_input		jpeg_consume_input_12
++#define	jpeg_core_output_dimensions		jpeg_core_output_dimensions_12
++#define	jpeg_calc_output_dimensions		jpeg_calc_output_dimensions_12
++#define	jpeg_save_markers		jpeg_save_markers_12
++#define	jpeg_set_marker_processor		jpeg_set_marker_processor_12
++#define	jpeg_read_coefficients		jpeg_read_coefficients_12
++#define	jpeg_write_coefficients		jpeg_write_coefficients_12
++#define	jpeg_copy_critical_parameters		jpeg_copy_critical_parameters_12
++#define	jpeg_abort_compress		jpeg_abort_compress_12
++#define	jpeg_abort_decompress		jpeg_abort_decompress_12
++#define	jpeg_abort		jpeg_abort_12
++#define	jpeg_destroy		jpeg_destroy_12
++#define	jpeg_resync_to_restart		jpeg_resync_to_restart_12
++#endif /* NEED_12_BIT_NAMES */
++
+ 
+ /* Default error-management setup */
+ EXTERN(struct jpeg_error_mgr *) jpeg_std_error
+--- jpeg-8d.orig/Makefile.am	2010-05-02 17:39:46.000000000 +0200
++++ jpeg-8d/Makefile.am	2012-01-30 19:22:33.734123099 +0100
+@@ -62,17 +62,17 @@
+         testimgp.jpg
+ 
+ # libtool libraries to build
+-lib_LTLIBRARIES = libjpeg.la
++lib_LTLIBRARIES = libjpeg12.la
+ 
+ # Library sources for libjpeg.la
+-libjpeg_la_SOURCES = $(LIBSOURCES)
++libjpeg12_la_SOURCES = $(LIBSOURCES)
+ 
+ # LDFLAGS for libjpeg.la
+-libjpeg_la_LDFLAGS = -no-undefined \
++libjpeg12_la_LDFLAGS = -no-undefined \
+         -version-info $(JPEG_LIB_VERSION)
+ 
+ if HAVE_LD_VERSION_SCRIPT
+-  libjpeg_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libjpeg.map
++  libjpeg12_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libjpeg.map
+ endif
+ 
+ # Executables to build
+@@ -81,12 +81,12 @@
+ # Executable sources & libs
+ cjpeg_SOURCES    = cjpeg.c rdppm.c rdgif.c rdtarga.c rdrle.c rdbmp.c \
+         rdswitch.c cdjpeg.c
+-cjpeg_LDADD      = libjpeg.la
++cjpeg_LDADD      = libjpeg12.la
+ djpeg_SOURCES    = djpeg.c wrppm.c wrgif.c wrtarga.c wrrle.c wrbmp.c \
+         rdcolmap.c cdjpeg.c
+-djpeg_LDADD      = libjpeg.la
++djpeg_LDADD      = libjpeg12.la
+ jpegtran_SOURCES = jpegtran.c rdswitch.c cdjpeg.c transupp.c
+-jpegtran_LDADD   = libjpeg.la
++jpegtran_LDADD   = libjpeg12.la
+ rdjpgcom_SOURCES = rdjpgcom.c
+ wrjpgcom_SOURCES = wrjpgcom.c
+ 
