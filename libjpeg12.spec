@@ -1,12 +1,12 @@
 Summary:	Library for handling different JPEG files - 12-bit version
 Summary(pl.UTF-8):	Biblioteka do manipulacji plikami w formacie JPEG - wersja 12-bitowa
 Name:		libjpeg12
-Version:	8d
+Version:	9
 Release:	1
 License:	distributable
 Group:		Libraries
 Source0:	http://www.ijg.org/files/jpegsrc.v%{version}.tar.gz
-# Source0-md5:	52654eb3b2e60c35731ea8fc87f1bd29
+# Source0-md5:	b397211ddfd506b92cd5e02a22ac924d
 Patch0:		libjpeg-maxmem-sysconf.patch
 Patch1:		libjpeg-12bit.patch
 URL:		http://www.ijg.org/
@@ -95,7 +95,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc README change.log
 %attr(755,root,root) %{_libdir}/libjpeg12.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libjpeg12.so.8
+%attr(755,root,root) %ghost %{_libdir}/libjpeg12.so.9
 
 %files devel
 %defattr(644,root,root,755)
