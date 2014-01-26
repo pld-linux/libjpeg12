@@ -205,14 +205,14 @@
  
  /*
   * These two functions are used to allocate and release small chunks of
---- jpeg-8d.orig/jmorecfg.h	2011-08-31 13:35:12.000000000 +0200
-+++ jpeg-8d/jmorecfg.h	2012-01-26 17:14:43.088960964 +0100
-@@ -21,7 +21,8 @@
-  * We do not support run-time selection of data precision, sorry.
+--- jpeg-9a/jmorecfg.h.orig	2014-01-26 17:31:32.791654317 +0100
++++ jpeg-9a/jmorecfg.h	2014-01-26 17:32:43.334984688 +0100
+@@ -30,7 +30,8 @@
+  * in all cases (see below).
   */
  
--#define BITS_IN_JSAMPLE  8	/* use 8 or 12 */
-+#define BITS_IN_JSAMPLE  12	/* use 8 or 12 */
+-#define BITS_IN_JSAMPLE  8	/* use 8, 9, 10, 11, or 12 */
++#define BITS_IN_JSAMPLE  12	/* use 8, 9, 10, 11, or 12 */
 +#define NEED_12_BIT_NAMES
  
  
