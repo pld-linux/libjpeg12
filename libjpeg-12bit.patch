@@ -377,3 +377,35 @@
  rdjpgcom_SOURCES = rdjpgcom.c
  wrjpgcom_SOURCES = wrjpgcom.c
  
+--- jpeg-9c/Makefile.am.orig	2018-04-14 08:53:59.934089520 +0200
++++ jpeg-9c/Makefile.am	2018-04-14 08:56:45.650754295 +0200
+@@ -105,7 +105,7 @@
+ 
+ # pkg-config file
+ pkgconfigdir = $(libdir)/pkgconfig
+-nodist_pkgconfig_DATA = libjpeg.pc
++nodist_pkgconfig_DATA = libjpeg12.pc
+ 
+ # Files to be cleaned
+ CLEANFILES = testout.ppm testout.bmp testout.jpg testoutp.ppm testoutp.jpg \
+--- jpeg-9c/configure.ac.orig	2018-04-14 08:57:46.364086935 +0200
++++ jpeg-9c/configure.ac	2018-04-14 08:57:49.737420232 +0200
+@@ -361,5 +361,5 @@
+          [`expr $major + $minor`:0:$minor])
+ AC_MSG_RESULT([$JPEG_LIB_VERSION])
+ 
+-AC_CONFIG_FILES([Makefile libjpeg.pc])
++AC_CONFIG_FILES([Makefile libjpeg12.pc:libjpeg.pc.in])
+ AC_OUTPUT
+--- jpeg-9c/libjpeg.pc.in.orig	2018-04-14 08:59:59.494085415 +0200
++++ jpeg-9c/libjpeg.pc.in	2018-04-14 09:00:18.150751868 +0200
+@@ -4,7 +4,7 @@
+ includedir=@includedir@
+ 
+ Name: libjpeg
+-Description: Reads and writes JPEG files
++Description: Reads and writes JPEG files, 12bpp
+ Version: @JPEG_LIB_VERSION@
+-Libs: -L${libdir} -ljpeg
++Libs: -L${libdir} -ljpeg12
+ Cflags: -I${includedir}
