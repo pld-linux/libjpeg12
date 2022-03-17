@@ -359,10 +359,10 @@
  
  /* Default error-management setup */
  EXTERN(struct jpeg_error_mgr *) jpeg_std_error
---- jpeg-8d.orig/Makefile.am	2010-05-02 17:39:46.000000000 +0200
-+++ jpeg-8d/Makefile.am	2012-01-30 19:22:33.734123099 +0100
-@@ -62,17 +62,17 @@
-         testimgp.jpg
+--- jpeg-9e/Makefile.am.orig	2021-12-06 13:42:58.000000000 +0100
++++ jpeg-9e/Makefile.am	2022-03-17 06:41:37.308055826 +0100
+@@ -65,17 +65,17 @@ TESTFILES= testorig.jpg testimg.ppm test
+         testprog.jpg testimgp.jpg
  
  # libtool libraries to build
 -lib_LTLIBRARIES = libjpeg.la
@@ -383,7 +383,7 @@
  endif
  
  # Executables to build
-@@ -81,12 +81,12 @@
+@@ -84,12 +84,12 @@ bin_PROGRAMS = cjpeg djpeg jpegtran rdjp
  # Executable sources & libs
  cjpeg_SOURCES    = cjpeg.c rdppm.c rdgif.c rdtarga.c rdrle.c rdbmp.c \
          rdswitch.c cdjpeg.c
@@ -399,9 +399,7 @@
  rdjpgcom_SOURCES = rdjpgcom.c
  wrjpgcom_SOURCES = wrjpgcom.c
  
---- jpeg-9c/Makefile.am.orig	2018-04-14 08:53:59.934089520 +0200
-+++ jpeg-9c/Makefile.am	2018-04-14 08:56:45.650754295 +0200
-@@ -105,7 +105,7 @@
+@@ -108,7 +108,7 @@ EXTRA_DIST =  $(DOCS) $(DISTMANS) $(MKFI
  
  # pkg-config file
  pkgconfigdir = $(libdir)/pkgconfig
@@ -409,12 +407,12 @@
 +nodist_pkgconfig_DATA = libjpeg12.pc
  
  # Files to be cleaned
- CLEANFILES = testout.ppm testout.bmp testout.jpg testoutp.ppm testoutp.jpg \
---- jpeg-9c/configure.ac.orig	2018-04-14 08:57:46.364086935 +0200
-+++ jpeg-9c/configure.ac	2018-04-14 08:57:49.737420232 +0200
-@@ -361,5 +361,5 @@
-          [`expr $major + $minor`:0:$minor])
- AC_MSG_RESULT([$JPEG_LIB_VERSION])
+ CLEANFILES = testout.ppm testout.gif testout.bmp testout.jpg testoutp.ppm \
+--- jpeg-9e/configure.ac.orig	2022-03-17 06:39:49.841971353 +0100
++++ jpeg-9e/configure.ac	2022-03-17 06:42:05.791234853 +0100
+@@ -361,5 +361,5 @@ AC_SUBST([JPEG_LIB_VERSION_MAJOR], [$maj
+ AC_SUBST([JPEG_LIB_VERSION_MINOR], [$minor])
+ AC_MSG_RESULT([$major.$minor.0])
  
 -AC_CONFIG_FILES([Makefile libjpeg.pc])
 +AC_CONFIG_FILES([Makefile libjpeg12.pc:libjpeg.pc.in])
